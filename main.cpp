@@ -25,12 +25,23 @@ DWORD WINAPI min_max(void* iArr)
 	cout << "Min: " << min << " Max: " << max << endl;
 	return 0;
 }
-/* DWORD WINAPI average(void* iArr)
+DWORD WINAPI average(void* iArr)
 {
-} */
+	int* arr = (int*)iArr;
+	int sum = 0;
+	for (int i = 0; i < n; i++) {
+		sum += arr[i];
+		Sleep(12);
+	}
+	arithmeticMean = sum / n;
+	cout << "Arithmetic mean: " << arithmeticMean << endl;
+	return 0;
+}
 int main() {
 	HANDLE hThread1;
 	DWORD IDThread1;
+	HANDLE hThread2;
+	DWORD IDThread2;
 	cout << "Input size of the array: " << endl;
 	cin >> n;
 	int* arr = new int[n];
@@ -43,7 +54,23 @@ int main() {
 		delete[] arr;
 		return GetLastError();
 	}
+	hThread2 = CreateThread(NULL, 0, average, arr, 0, &IDThread2);
+	if (hThread2 == NULL) {
+		delete[] arr;
+		return GetLastError();
+	}
 	WaitForSingleObject(hThread1, INFINITE);
+	WaitForSingleObject(hThread2, INFINITE);
+	for (int i = 0; i < n; i++) {
+		if (arr[i] == min || arr[i] == max) {
+			arr[i] = arithmeticMean;
+		}
+	}
+	cout << "Changed array: " << endl;
+	for (int i = 0; i < n; i++) {
+		cout << arr[i] << " ";
+	}
+	cout << endl;
 	delete[] arr;
 	return 0;
 }
